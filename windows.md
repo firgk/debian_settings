@@ -912,9 +912,11 @@ keybindings:
 ```
 
 
-## powertoys 配置工具
+## powertoys 配置文件
+
 
 ![](doc/powertoys_settings_133819102381786548.ptb)
+
 
 
 ## linux reader
