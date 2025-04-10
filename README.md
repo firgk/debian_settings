@@ -8,8 +8,11 @@
 
 最大化之后关闭软件，之后再次打开会丢失记忆的大小
 
-	其实是支持的，但是qq 微信 不支持别的系统软件支持。
+	其实是支持的，但是qq 微信 不支持
+	别的系统软件支持。
 
+鼠标指针黏文件
+右键可以免点二次击，直接可以打开文件
 
 
 
@@ -524,6 +527,37 @@ unar -e GB18030 test.zip
 
 
 
+## 快捷键映射工具
+
+	ahk (autohotkey) for linux (github)
+	
+![](doc/ahk教程.pdf)
+
+我的键位：
+
+	!z::  
+	Send !{Left}
+	return
+	
+	!e::
+	Send {Enter}
+	return
+	
+	!r::
+	Send {BackSpace}
+	return
+	
+	!CapsLock::
+	Send {Esc}
+	return
+	
+	!1::
+	Send {Left}
+	return
+	
+	!2::
+	Send {Right}
+	return
 
 
 # 开发软件
