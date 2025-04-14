@@ -14,6 +14,11 @@
 鼠标指针黏文件
 右键可以免点二次击，直接可以打开文件
 
+迁移系统
+
+分区
+
+有概率蓝牙鼠标 被重置 灵敏度
 
 
 
@@ -153,12 +158,31 @@
 
 ## 终端代理
 
+一次性
 
       export http_proxy=http://127.0.0.1:7897
       export https_proxy=http://127.0.0.1:7897
 
       unset http_proxy
       unset https_proxy
+
+
+使用脚本
+
+	cla
+      export http_proxy=http://127.0.0.1:7897
+      export https_proxy=http://127.0.0.1:7897
+	uncla
+      unset http_proxy
+      unset https_proxy
+
+启动代理
+	source cla
+	
+关闭代理
+	source uncla
+
+
 
 
 
@@ -221,6 +245,33 @@ ip r
 
 
 
+## 禁用 alt + 滚轮 放大桌面
+
+要在 xfce4 的 gui 中禁用此设置，请执行以下操作：
+
+1. 在出现的“Application Finder”窗口中，键入：xfwm4-tweaks-settings ( 或者在设置中找到   windows manager tweak) 
+2. 单击“合成器”选项卡
+3. 取消选中“使用鼠标滚轮缩放桌面”
+4. 点击“关闭”
+
+
+
+## 解决 Linux 系统卡死问题 (桌面环境卡死)
+
+### 首选
+
+在使用 Linux 系统时，有时会遇到系统卡死的情况。以下是一些常见的解决方法。
+1. 使用 `Ctrl + Alt + F1-F6`  (随便选一个: 例如 `Ctrl + Alt + F2`) 切换到文字界面
+2. top 查看并且杀死进程
+
+	kill -9  PID
+	pkill thunar
+
+
+### 重启系统
+
+使用 Magic SysRq 键重启系统
+长按电源键 重启系统
 # 美化
 
 
@@ -560,6 +611,14 @@ unar -e GB18030 test.zip
 	return
 
 
+## 硬盘管理 gui 软件
+
+`sudo apt install gparted`
+
+
+
+
+
 # 开发软件
 
 
@@ -669,3 +728,15 @@ vi .bashrc
 	redis-server
 	
 	redis-cli
+
+## sqlite图形化管理界面DB Browser for SQLite
+
+	sudo apt-get install sqlitebrowser
+
+支持导出`json`格式
+
+
+
+
+
+

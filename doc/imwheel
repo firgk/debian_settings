@@ -1,0 +1,3 @@
+sudo killall imwheel
+sudo vim ~/.imwheelrc
+imwheel 
