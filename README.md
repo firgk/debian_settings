@@ -6,24 +6,24 @@
 
 # todo
 
-最大化之后关闭软件，之后再次打开会丢失记忆的大小
 
-	其实是支持的，但是qq 微信 不支持
-	别的系统软件支持。
+
+语音输入工具
 
 鼠标指针黏文件
-右键可以免点二次击，直接可以打开文件
 
-
-
-分区
+添加 右键运行sh文件 快捷键
 
 有概率蓝牙鼠标 被重置 灵敏度
 
 
 
 
+
+
+
 # 基础
+
 ## install
 
       English version
@@ -43,6 +43,8 @@
       安装中文输入法 sudo apt install ibus-pinyin
       彻底关闭输入法， 或者重启系统
       在ibus-setup 中 添加中文输入法， 并且切换输入法切换
+
+
 
 ### 设置中设置
 
@@ -79,9 +81,20 @@
 
 ## 基础软件
 
+
       修复依赖
       apt get install -f
          sudo apt --fix-broken install
+
+
+      删除软件
+      
+         删除配置
+         sudo apt purge XXXX
+         
+         不删除配置
+         apt remove XXXX
+	
 
 
 
@@ -112,13 +125,63 @@
       export PATH="$PATH:~/bin"
 
 
+## 环境变量
 
+	/etc/profile
+	.bashrc
+	
 ## small
 
       不要开启 save session for future logins
 
 
 # 系统优化
+
+
+
+
+
+## 开始菜单管理
+
+
+	使用 LXMenuEditor
+	LXMenuEditor 对 debian 支持有问题，启动脚本有问题
+	本质是 jar 包，直接使用 java -jar 启动
+	
+	没有修改权限，使用 sudo 即可
+
+
+
+
+
+
+## 切换系统语言
+
+	sudo dpkg-reconfigure locales
+	第一步，第二步都选择中文即可
+		如果第一步选过，只是选择第二步就可以
+
+
+## 窗口栏 同种类型但是会聚合显示
+
+	窗口设置中可以修改
+
+
+## 剪切版候选
+
+使用 `fcitx 5` 自带的
+右键状态栏舒服法,点击设置
+在 `addons` 栏下　的　`Module`  `Clipboard`
+定义一个快捷键就可以了
+
+
+## 丢失记忆的大小
+
+最大化之后关闭软件，之后再次打开会丢失记忆的大小
+
+	其实是支持的，但是qq 微信 不支持
+	系统软件支持
+
 
 ## 鼠标轮询率
 
@@ -329,6 +392,39 @@ resize2fs /dev/sdb1
 
 
 
+## 排查开机启动项(todesk为例) systemctl级
+
+	查找
+	sudo systemctl --all | grep wps
+	禁用
+	systemctl stop todeskd.service
+	移除
+	sudo systemctl list-units --type=service | grep todesk
+
+
+
+
+## 杀死后台进程的脚本
+
+
+```
+#!/bin/bash
+# 查找wps进程的PID
+wps_pid=$(ps -aux | grep wps | grep -v grep | awk '{print $2}')
+
+# 如果找到wps的PID，则终止进程
+if [ -n "$wps_pid" ]; then
+    kill -9 $wps_pid
+    echo "已终止 WPS 进程，PID 为 $wps_pid"
+else
+    echo "未找到 WPS 进程"
+fi
+
+```
+
+
+
+
 
 
 
@@ -480,6 +576,11 @@ debian 安装 plymouth 美化开机动画
 
 
 # 软件
+
+
+## 文本识别工具 
+
+UmiOcr 
 
 
 ## 谷歌浏览器中文
