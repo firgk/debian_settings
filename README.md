@@ -3,6 +3,12 @@
       windows 转 debian，遇到的问题 和 从0到1 的配置
 
 
+# 注意
+
+部分命令需要 sudo 权限,但是没有额外提醒
+部分命令需要 sudo 权限,但是没有额外提醒
+部分命令需要 sudo 权限,但是没有额外提醒
+
 # todo
 
 
@@ -442,65 +448,33 @@ fi
 ## 美化登陆界面
 
 
-### 图形化操作
+> 图形化 
 
-用这个图形化界面操作
+用这个图形化界面操作 LightDM
 
       sudo apt install lightdm-gtk-greeter-settings
 
+      apt install lightdm
 
 
-LightDM 是一个独立于不同桌面环境的登录管理器，想对于 GDM，它比较轻便，并且可以方便的自定义主题，LightDM 由 Canonical 的 Robert Ancell 和这些贡献者共同开发，并在 Contributor License Agreement 许可证下发布，但其版权是归 Canonical 所有。
 
-不依赖 Gnome
-使用 webkit 来绘制主题
-支持 Gtk 和 Qt
-可以灵活自定义（GTK basic 主题，Ubuntu Precise unity 主题）
-
-LightDM 从 Debian Wheezy 开始提供，使用 Jessie 和 Sid 仓库的版本也足够稳定。
-
-要安装 LightDM，以超级用户 root 运行以下命令：
-
-aptitude install lightdm
-
-配置
-LightDM 的配置文件是 /etc/lightdm/lightdm.conf，若要修改默认配置，最好先备份原始文件。
-
-要更改当前默认登录管理器，以超级用户运行：
-
-dpkg-reconfigure lightdm
-如果不熟悉 LightDM，建议保留 GDM， slim 或者其他登录管理器作为备用。
+> 手动 配置 LightDM
 
 
-启用自动登录
-在 LightDM 配置文件里查找以下行，取消其注释，并根据自己喜好进行配置。
+      LightDM 的配置文件是 /etc/lightdm/lightdm.conf，若要修改默认配置，最好先备份原始文件。
+      dpkg-reconfigure lightdm
+
+      启用自动登录
+      在 LightDM 配置文件里查找以下行，取消其注释，并根据自己喜好进行配置。
+      [SeatDefaults]
+      #autologin-user=
+      #autologin-user-timeout=0
 
 
-[SeatDefaults]
-#autologin-user=
-#autologin-user-timeout=0
-
-更改登录管理器背景
-Debian 的 LightDM GTK 登录背景是在 /etc/lightdm/lightdm-gtk-greeter.conf 里配置，里面配置的默认登录背景图片指向 /usr/share/images/desktop-base/desktop-background，这是一个由 update-alternatives 管理的链接。
-
-因此，若要更改背景，可以从 /usr/share/images/desktop-base/ 找一些你喜欢的图片，然后使用 update-alternatives 来更改 desktop-background 组。
-
-
-update-alternatives --config desktop-background
-
-参见
-lightdm - Debian 软件包
-
-DisplayManager
-
-github, github issue tracker 上的 LightDM
-
-CategoryBootProcess
-
-zh_CN/LightDM (最后修改时间 2019-12-22 08:09:38)
-
-Debian privacy policy, Wiki team, bugs and config.Powered by MoinMoin and Python, with hosting provided by Metropolitan Area Network Darmstadt.
-
+      更改登录管理器背景
+      Debian 的 LightDM GTK 登录背景是在 /etc/lightdm/lightdm-gtk-greeter.conf 里配置，里面配置的默认登录背景图片指向 /usr/share/images/desktop-base/desktop-background，这是一个由 update-alternatives 管理的链接。
+      因此，若要更改背景，可以从 /usr/share/images/desktop-base/ 找一些你喜欢的图片，然后使用 update-alternatives 来更改 desktop-background 组。
+      update-alternatives --config desktop-background
 
 
 
@@ -511,15 +485,10 @@ Debian privacy policy, Wiki team, bugs and config.Powered by MoinMoin and Python
 
 debian 安装 plymouth 美化开机动画
 
-
-      debian默认的开机动画，即在grub菜单之后，就是密密麻麻的文本流，显示的是内核消息。有时还能看到一些无伤大雅的报错或者警告信息，说实话我都不知道到底为什么？
-      下载，请注意wiki里kde桌面的提醒
       sudo apt install plymouth plymouth-themes
 
       修改grub配置，建议修改前保存一下旧有配置
       sudo vim /etc/default/grub
-
-
 
       应用修改
       sudo update-grub2
@@ -527,23 +496,14 @@ debian 安装 plymouth 美化开机动画
       查看一下默认主题
       sudo plymouth-set-default-theme -l
 
-
-
       设置主题
       sudo plymouth-set-default-theme -R softwaves
 
       看看效果
       softwaves
 
-
       homeworld
-
-
       tribar 有点像centos7的启动动画…… 爱了爱了
-
-
-      不试验了，花里胡哨，没啥用……
-      么么哒……
 
 
 
@@ -551,10 +511,6 @@ debian 安装 plymouth 美化开机动画
 
 
 ## fcitx5 切换皮肤
-
-
-
-**克隆项目**:
 
       git clone https://github.com/tonyfettes/fcitx5-nord.git
 
@@ -584,8 +540,13 @@ UmiOcr
 
 ## 谷歌浏览器中文
 
+
+      找到谷歌浏览器启动项
       whereis google-chrome
-      LANGUAGE=zh_cn google-chrome
+            我的在 /usr/bin/google-chrome
+
+      修改 /usr/bin/google-chrome 第一行添加 export LANGUAGE=zh_cn google-chrome
+
 
 或者 将系统语言设置为中文，浏览器界面也会变成中文
 
@@ -614,13 +575,10 @@ UmiOcr
 
 
 
-
 ## 录制
 
 屏幕
-
       sudo apt install simplescreenrecorder
-
 
 
 ## 加密压缩和不加密压缩 zip unzip
@@ -630,28 +588,19 @@ UmiOcr
       zip -r --password mypasscode blog.zip blog/
 
 
-
-
 ## 软件安装位置
 
-/usr 系统级的目录，可以理解为 C:/Windows/ ， /usr/lib 可理解为 C:/Windows/System32 。
 
-/usr/local 用户级的程序目录，可以理解为 C:/Progrem Files/ 。用户自己编译的软件默认会安装到这个目录下。
+      /usr 系统级的目录，可以理解为 C:/Windows/ ， /usr/lib 可理解为 C:/Windows/System32
+      /usr/local 用户级的程序目录，可以理解为 C:/Progrem Files/ 。用户自己编译的软件默认会安装到这个目录下
+      /opt 用户级的程序目录，可以理解为 D:/Software ， opt 有可选的意思，这里可以用于放置第三方大型软件
 
-/opt 用户级的程序目录，可以理解为 D:/Software ， opt 有可选的意思，这里可以用于放置第三方大型软件（或游戏），当你不需要时，直接 rm -rf 掉即可。
-
-在硬盘容量不够时，也可将 /opt 单独挂载到其他磁盘上使用。
-
-源码放哪里？
-/usr/src 系统级的源码目录。
-
-/usr/local/src 用户级的源码目录。
+      源码放哪里
+      /usr/src 系统级的源码目录
+      /usr/local/src 用户级的源码目录
 
 
-
-## 资源监视器Bashtop
-
-
+## 资源监视器 Bashtop
 
       sudo apt update
       sudo apt install git
@@ -665,49 +614,45 @@ UmiOcr
       sudo ./build --remove
 
 
+## 显示gpu
 
+      使用 Intel-gpu-tools
+
+      intel_gpu_top 即可查看
 
 
 
 ## 解压乱码
- 安装
 
-sudo apt-get install unar
-1
-2.列出压缩包内容
+      unar 会自动检测编码
+      sudo apt-get install unar
 
-lsar test.zip
-1
-3.解压压缩包
+      使用:
+      unar test.zip
 
-unar test.zip
-1
-4.unar常用选项解释
+      参数:
+      -o
+      解释：指定解压结果保存的位置
+      unar test.zip -o /home/dir/
 
--o
+      -e
+      解释：指定编码
+      unar -e GBK test.zip
 
-解释：指定解压结果保存的位置
-unar test.zip -o /home/dir/
+      -p
+      解释：指定解压密码
+      unar -p 123456 test.zip
 
--e
 
-解释：指定编码
-unar -e GBK test.zip
+再次乱码, 可以尝试
 
--p
 
-解释：指定解压密码
-unar -p 123456 test.zip
+      lsar test.zip
+      若发现乱码，可指定压缩包文件名使用的编码格式,并尝试几种
+      lsar -e GB18030 test.zip
 
-3.解决linux解压压缩包中文文件名乱码问题
-
-lsar test.zip
-
-###若发现乱码，可指定压缩包文件名使用的编码格式##
-lsar -e GB18030 test.zip
-
-###若能正常列出文件名，可解压###
-unar -e GB18030 test.zip
+      若能正常列出文件名，可解压
+      unar -e GB18030 test.zip
 
 
 
@@ -715,11 +660,11 @@ unar -e GB18030 test.zip
 
 ## 自定义添加软件到 application finder
 
+
 位置
 
 	/usr/share/applications/
  
-
 
 
 
@@ -730,12 +675,9 @@ unar -e GB18030 test.zip
 
 
 
-
-
 ## xfce自带的webdav
 
-	dav://user@106.12.212.6:5244/dav/
-
+	dav://user@106.12.111.6:5244/dav/
 
 
 ## 快捷键映射工具
@@ -743,6 +685,7 @@ unar -e GB18030 test.zip
 	ahk (autohotkey) for linux (github)
 	
 ![](doc/ahk教程.pdf)
+
 
 我的键位：
 
@@ -771,10 +714,10 @@ unar -e GB18030 test.zip
 	return
 
 
+
 ## 硬盘管理 gui 软件
 
 `sudo apt install gparted`
-
 
 
 
@@ -784,10 +727,11 @@ unar -e GB18030 test.zip
 
 ## java
 
-debian 系统下安装jdk1.8
-第一步：下载安装包
-下载Linux环境下的jdk8，请去（Java Downloads | Oracle）中下载jdk的安装文件；
-由于我的Linux是64位的，因此我下载jdk-8u311-linux-x64.tar.gz
+
+      debian 系统下安装jdk1.8
+      第一步：下载安装包
+      下载Linux环境下的jdk8，请去（Java Downloads | Oracle）中下载jdk的安装文件；
+      由于我的Linux是64位的，因此我下载jdk-8u311-linux-x64.tar.gz
 
 
 2
@@ -829,8 +773,24 @@ vi .bashrc
 
 
 
-## mysql docker 5.7
 
+
+
+## 一些 docker 镜像
+
+      mysql docker 5.7
+      docker run -d \
+         --name mysql \
+         -p 3306:3306 \
+         -e TZ=Asia/Shanghai \
+         -e MYSQL_ROOT_PASSWORD=123456 \
+         mysql:5.7
+
+
+
+
+
+## mysql docker 5.7
 
       docker run -d \
          --name mysql \
@@ -842,9 +802,10 @@ vi .bashrc
 
 
 
-> 连接工具
->  vscode 插件
-> https://database-client.com/#/home
+连接工具
+
+      vscode 插件
+      https://database-client.com/#/home
 
 
 
@@ -852,25 +813,13 @@ vi .bashrc
 ## python
 
 `pip3 install `全局安装包有问题
+
 使用创建虚拟环境 可以解决
 
-	1
-	在当前目录下创建名为 tempenv 的虚拟环境。
 	python3 -m venv ./tempenv
-	
-	2
-	切换路径 
 	cd tempenv
-	
-	3
-	激活虚拟环境
 	source bin/activate
-	
-	4
 	pip install flask
-	
-	5
-	退出虚拟环境
 	deactivate
 
 
@@ -880,14 +829,17 @@ vi .bashrc
 
 	关闭
 	sudo service redis-server stop
-	1
 	开启服务
 	sudo servcie redis-server start
-	1
 	重启
 	redis-server
-	
+      测试
 	redis-cli
+      set hello world
+      get hello
+
+
+
 
 ## sqlite图形化管理界面DB Browser for SQLite
 
