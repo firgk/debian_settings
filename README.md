@@ -1,25 +1,25 @@
 # debian_settings
 
-      windows 转 debian，遇到的问题 和 从0到1 的配置
+      debian配置，遇到的问题和记录
 
 
 # 注意
 
       部分命令需要 sudo 权限,但是没有额外提醒
-      部分命令需要 sudo 权限,但是没有额外提醒
-      部分命令需要 sudo 权限,但是没有额外提醒
+
+
 
 # todo
 
+      语音输入工具
 
+      鼠标指针黏文件
 
-语音输入工具
+      添加 右键运行sh文件 快捷键
 
-鼠标指针黏文件
+      有概率蓝牙鼠标 被重置 灵敏度
 
-添加 右键运行sh文件 快捷键
-
-有概率蓝牙鼠标 被重置 灵敏度
+      图片 pdf 深色遮罩 系统级 深色处理
 
 
 
@@ -44,11 +44,6 @@
       change /etc/apt/sourcelist : sudo vim /etc/apt/sources.list
       sudo apt update
       sudo apt install vim
-
-      安装中文输入法 sudo apt install ibus-pinyin
-      彻底关闭输入法， 或者重启系统
-      在ibus-setup 中 添加中文输入法， 并且切换输入法切换
-
 
 
 ### 设置中设置
@@ -76,11 +71,6 @@
       window manager > title left
 
 
-
-### 快捷键
-
-      window manager > keyboard 
-      keyboard > xfce-appfinder
 
 
 
@@ -121,6 +111,17 @@
 
 
 
+      ibus-pinyin
+      安装中文输入法 sudo apt install ibus-pinyin
+      彻底关闭输入法， 或者重启系统
+      在ibus-setup 中 添加中文输入法， 并且切换输入法切换
+
+
+      fictx5
+
+
+
+
 
 
 
@@ -135,12 +136,35 @@
 	/etc/profile
 	.bashrc
 	
-## small
-
-      不要开启 save session for future logins
 
 
 # 系统优化
+
+
+
+
+
+
+
+### apt install 工具添加网络代理
+
+Create a new configuration file named proxy.conf.
+
+	sudo touch /etc/apt/apt.conf.d/proxy.conf
+
+Open the proxy.conf file in a text editor.
+
+	sudo vim /etc/apt/apt.conf.d/proxy.conf
+
+and then add the following lines.
+
+	Acquire {
+	  HTTP::proxy "http://127.0.0.1:8080";
+	  HTTPS::proxy "http://127.0.0.1:8080";
+	}
+
+
+
 
 
 
@@ -154,9 +178,6 @@
 	本质是 jar 包，直接使用 java -jar 启动
 	
 	没有修改权限，使用 sudo 即可
-
-
-
 
 
 
@@ -255,9 +276,6 @@
 
 
 
-
-
-
 ## 蓝牙耳机问题
 
       https://www.cnblogs.com/rookieagle/p/18098106
@@ -335,6 +353,30 @@ ip r
 
 
 
+
+
+## 杀死后台进程的脚本
+
+```
+#!/bin/bash
+# 查找wps进程的PID
+wps_pid=$(ps -aux | grep wps | grep -v grep | awk '{print $2}')
+
+# 如果找到wps的PID，则终止进程
+if [ -n "$wps_pid" ]; then
+    kill -9 $wps_pid
+    echo "已终止 WPS 进程，PID 为 $wps_pid"
+else
+    echo "未找到 WPS 进程"
+fi
+
+```
+
+
+
+
+
+
 ## 解决 Linux 系统卡死问题 (桌面环境卡死)
 
 ### 首选
@@ -347,21 +389,32 @@ ip r
 	pkill thunar
 
 
-### 重启系统
+重启 桌面环境
 
-使用 Magic SysRq 键重启系统
-长按电源键 重启系统
+	sudo systemctl restart lightdm.service
 
 
+## thunar 使用 gvfs 因为挂载网络资源超时 卡死 
+
+	systemctl --user restart gvfs-daemon.service
 
 
 
 
 ## 迁移系统
 
+危险操作
 
+从 nvme0n1p1  复制到 sda1 （移动硬盘）
 
 ```
+
+查看
+fdisk -l
+
+
+
+
 
 dd if=/dev/nvme0n1p1 of=/dev/sda1 bs=4M status=progress
 if 输入设备
@@ -388,9 +441,22 @@ resize2fs /dev/sdb1
 
 
 
+休眠出现问题
 
-休眠出现问题,调整一下 swapon swapoff 就可以了:
+调整一下 swapon swapoff 就可以了:
+
 	对旧硬盘 swapoff ,之后对新的盘启用 swapon
+
+或者
+
+	修改两个UUID
+	cat /etc/initramfs-tools/conf.d/resume
+	vim /etc/default/grub
+		GRUB_CMDLINE_LINUX_DEFAULT="quiet splash ..."
+	
+	更新他俩个
+	sudo update-initramfs -u
+	sudo update-grub
 
 ```
 
@@ -409,23 +475,97 @@ resize2fs /dev/sdb1
 
 
 
-## 杀死后台进程的脚本
+
+## 充电阈值控制 电源
+
+	 Huawei MateBook 14 AMD (2020)
+	 我的是荣耀 magicbook 2021 intel i5  14-inch
+
+直接google 型号 + arch wiki 可以搜到
+
+2025-05-04
+
+	华为 WMI 驱动程序 `v3.3` 用于公开电池保护阈值，已合并到内核 `5.5`[[2]](https://github.com/aymanbagabas/Huawei-WMI)。 存在一个问题[[3]](https://github.com/nekr0z/matebook-applet/issues/22)，硬件报告的充电阈值不正确，阻止了电池保护功能的工作。 驱动程序的维护者表示，这应该在用户空间中修复[[4]](https://github.com/aymanbagabas/Huawei-WMI/issues/36#issuecomment-657127421)。
+	
+	一个临时的解决方法是将一些合理的数值写入文件
+	
+	# echo '40 70' > /sys/devices/platform/huawei-wmi/charge_control_thresholds
+	
+      or
+      
+
+	# vim /sys/devices/platform/huawei-wmi/charge_control_thresholds
+      输入 40 70
 
 
-```
-#!/bin/bash
-# 查找wps进程的PID
-wps_pid=$(ps -aux | grep wps | grep -v grep | awk '{print $2}')
+	这将启用电池保护（在本例中，设备将在 70% 时停止充电）。 为了让 [matebook-applet](https://aur.archlinux.org/packages/matebook-applet/)AUR 在没有超级用户权限的情况下运行，请将您自己添加到 `huawei-wmi` [用户组](https://wiki.archlinux.org.cn/title/User_group "User group")，因为阈值对于非 root 用户仍然是只读的。
+	
 
-# 如果找到wps的PID，则终止进程
-if [ -n "$wps_pid" ]; then
-    kill -9 $wps_pid
-    echo "已终止 WPS 进程，PID 为 $wps_pid"
-else
-    echo "未找到 WPS 进程"
-fi
 
-```
+# 错误修复
+
+
+      不要开启 save session for future logins
+
+
+
+## 剪切板无法正确处理图片
+
+xfce4-screenshooter 无法将图片直接复制到剪切板
+也可以在 arch wiki 上检索到
+大致的意思是 clipboard 问题，或者是 启动了多个 clipboard 进程
+导致即使桌面状态栏退出了 clipboard 仍然不可用
+解决方法是 在 setting -> session and startup 中关闭 clipboard 的开机启动，不使用它，或者开机后手动启动
+
+
+
+
+
+
+Xfce4 screenshooter cannot copy pictures directly to the clipboard (copy to the clipboard)
+It can also be retrieved on the arch wiki
+The general meaning is the clipboard problem, or multiple clipboard processes have been started
+As a result, even if the desktop status bar exits the clipboard, it is still unavailable
+The solution is to turn off the startup of clipboard in setting ->session and startup, do not use it, or start it manually after startup
+
+
+
+
+
+
+
+## 解压乱码
+
+      unar 会自动检测编码
+      sudo apt-get install unar
+
+      使用:
+      unar test.zip
+
+      参数:
+      -o
+      解释：指定解压结果保存的位置
+      unar test.zip -o /home/dir/
+
+      -e
+      解释：指定编码
+      unar -e GBK test.zip
+
+      -p
+      解释：指定解压密码
+      unar -p 123456 test.zip
+
+
+再次乱码, 可以尝试
+
+
+      lsar test.zip
+      若发现乱码，可指定压缩包文件名使用的编码格式,并尝试几种
+      lsar -e GB18030 test.zip
+
+      若能正常列出文件名，可解压
+      unar -e GB18030 test.zip
+
 
 
 
@@ -533,6 +673,69 @@ debian 安装 plymouth 美化开机动画
 # 软件
 
 
+
+
+
+### wine
+
+安装 wine 10.x
+
+
+最佳兼容性
+
+wincfg 其换成win7
+
+
+
+使用wine时，中文字体会显示成方框□
+网上下载 simsun.ttc
+
+安装字体
+
+1. 单独复制字体到wine容器 （推荐）
+如果说是最后要把wine容器当成软件发行出去，那就需要把找来的字体文件粘贴到容器的drive_c\windows\Fonts目录。
+
+
+2. 安装到Linux
+deepin可以双击安装，网上有说复制到/usr/share/fonts的，没试过，不知道可不可以。一次安装完，以后本机用其他wine容器的时候也不需要再次操作，就可以正常显示。
+
+
+改字体渲染引擎 （没试过）
+到上面一步，wine的中文字体已经可以正常显示了，但是其中的字体渲染引擎却不尽人意，可以改一下函数库的riched20（管字体的，网上可以查）
+先运行你的winecfg，像这样：
+
+	env WINEPRIFIX=你的wine容器根目录 wine运行程序 winecfg
+
+按我的就是（wineprefix的那个引号有空格就加，我这里是以防万一）：
+
+	env WINEPREFIX="/home/deepin/wine/DocBox" deepin-wine6-stable winecfg
+
+然后找到函数库，添加riched20(点击第二步的下拉框时选择riched20)
+
+完成后就是原装先于内建，也可以按编辑改成原装，之后应用确定就行，在当前wine容器就生效了
+
+
+
+
+
+
+
+## 本地 andorid 模拟器 (性能差，吃cpu）
+
+```yml
+https://github.com/budtmo/docker-android
+
+docker run -d \
+-p 6080:6080 \
+-e EMULATOR_DEVICE="Samsung Galaxy S10" \
+-e WEB_VNC=true \
+--device /dev/kvm \
+--name android-container \
+-v data:/home/firgk/andorid \
+budtmo/docker-android:emulator_11.0
+```
+
+
 ## 文本识别工具 
 
 UmiOcr 
@@ -549,6 +752,7 @@ UmiOcr
 
 
 或者 将系统语言设置为中文，浏览器界面也会变成中文
+
 
 
 ## 虚拟机 vitrual box
@@ -581,6 +785,7 @@ UmiOcr
       sudo apt install simplescreenrecorder
 
 
+
 ## 加密压缩和不加密压缩 zip unzip
 
 
@@ -588,8 +793,9 @@ UmiOcr
       zip -r --password mypasscode blog.zip blog/
 
 
-## 软件安装位置
 
+
+## 软件安装位置
 
       /usr 系统级的目录，可以理解为 C:/Windows/ ， /usr/lib 可理解为 C:/Windows/System32
       /usr/local 用户级的程序目录，可以理解为 C:/Progrem Files/ 。用户自己编译的软件默认会安装到这个目录下
@@ -614,46 +820,12 @@ UmiOcr
       sudo ./build --remove
 
 
+
 ## 显示gpu
 
       使用 Intel-gpu-tools
 
       intel_gpu_top 即可查看
-
-
-
-## 解压乱码
-
-      unar 会自动检测编码
-      sudo apt-get install unar
-
-      使用:
-      unar test.zip
-
-      参数:
-      -o
-      解释：指定解压结果保存的位置
-      unar test.zip -o /home/dir/
-
-      -e
-      解释：指定编码
-      unar -e GBK test.zip
-
-      -p
-      解释：指定解压密码
-      unar -p 123456 test.zip
-
-
-再次乱码, 可以尝试
-
-
-      lsar test.zip
-      若发现乱码，可指定压缩包文件名使用的编码格式,并尝试几种
-      lsar -e GB18030 test.zip
-
-      若能正常列出文件名，可解压
-      unar -e GB18030 test.zip
-
 
 
 
@@ -675,19 +847,83 @@ UmiOcr
 
 
 
+
 ## xfce自带的webdav
 
 	dav://user@106.12.111.6:5244/dav/
 
 
-## 快捷键映射工具
+
+## 硬盘管理 gui 软件
+
+`sudo apt install gparted`
+
+
+## unzip解压 高级 部分解压
+
+	
+	1. 解压整个.zip文件：
+	“`shell
+	unzip file.zip
+	“`
+	
+	2. 查看.zip文件中的文件列表：
+	“`shell
+	unzip -l file.zip
+	“`
+	这将列出.zip文件中的所有文件，并显示文件的详细信息，如文件名、压缩比、压缩时间等。
+	
+	3. 解压指定文件到当前目录：
+	“`shell
+	unzip file.zip file1
+	“`
+	这将只解压名为file1的文件到当前目录。
+	
+	4. 解压指定目录下的所有文件：
+	“`shell
+	unzip file.zip folder/*
+	“`
+	这将解压名为folder目录下的所有文件到当前目录。
+	
+	5. 解压.zip文件时排除指定文件或目录：
+	“`shell
+	unzip -x file.zip exclude1 exclude2
+	“`
+	这将解压.zip文件时排除名为exclude1和exclude2的文件或目录。
+	
+	6. 解压指定文件到指定目录：
+	“`shell
+	unzip file.zip -d target_folder file1
+	“`
+	这将只解压名为file1的文件到target_folder目录。
+	
+	以上是在Linux中解压.zip文件部分文件的命令示例。根据实际情况选择合适的命令来满足你的需求。
+
+
+
+
+
+
+
+
+
+## 快捷键
+
+      window manager > keyboard 
+      keyboard > xfce-appfinder
+
+
+### 快捷键映射工具
+
 
 	ahk (autohotkey) for linux (github)
-	
+
+
 ![](doc/ahk教程.pdf)
 
 
 我的键位：
+
 
 	!z::  
 	Send !{Left}
@@ -714,10 +950,6 @@ UmiOcr
 	return
 
 
-
-## 硬盘管理 gui 软件
-
-`sudo apt install gparted`
 
 
 
@@ -851,4 +1083,4 @@ vi .bashrc
 
 
 
-
+# 其他
