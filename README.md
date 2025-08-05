@@ -19,17 +19,51 @@
 
       有概率蓝牙鼠标 被重置 灵敏度
 
-      图片 pdf 深色遮罩 系统级 深色处理
+      系统级 深色遮罩处理
+
+      linux 点击链接的时候 默认新窗口打开
+
+            setting->default Appcalitions -> Others -> 
+            搜索 html
+            设置为 新的桌面文件 打开
+            ！ 未尝试
+
+
+            新的桌面文件如下：
+
+            [Desktop Entry]
+            Version=1.0
+            Type=Application
+            Name=chrome-new-window
+            Comment=
+            Exec=google-chrome  --new-window  %u
+            Icon=09F1_360ChromeX.0
+            Path=
+            Terminal=false
+            StartupNotify=false
 
 
 
+## 已经完成
+
+      图片 pdf 深色遮罩 
+            atril document viewer 支持 pdf 颜色反转
+
+
+      切换工作区，chrome 看视频的时候会有bug,直接切换到桌面了，无法对焦
+            打开一个新的 chrome 页面（独立窗口），之后在他两个之前切换（使用 alt + tab ），就正常了。
 
 
 
 
 # 基础
 
+
+
+
 ## install
+
+      debian12
 
       English version
 
@@ -124,6 +158,14 @@
 
 
 
+### 解压和压缩
+
+      tar -cvf yourfile.tar your_directory/
+
+      tar -xvf yourfile.tar
+
+
+
 
 ## 添加某个目录到环境变量
 
@@ -140,6 +182,155 @@
 
 # 系统优化
 
+
+
+
+
+## 系统级监控和任务
+
+查看电量
+cat /sys/class/power_supply/BAT1/status
+
+指定规则
+vim /etc/udev/rules.d/myrules
+
+写入规则
+SUBSYSTEM=="power_supply", ATTR{status}=="Discharging", ATTR{capacity}=="[0-9]",  RUN+="/usr/bin/systemctl hibernate"
+
+
+
+
+## 关闭 todesk 后台占用
+systemctl stop todeskd.service
+
+
+## 禁用 LightDM
+sudo systemctl stop lightdm.service
+
+
+
+
+## 如何在XFCE中显示桌面上的全名
+
+
+在我的主目录中，我必须创建一个名为.gtkrc-2.0的文件，因为没有一个现有的文件。在这个新文件中，我输入并保存了以下内容：
+
+	style "xfdesktop-icon-view" {
+	    XfdesktopIconView::ellipsize-icon-labels = 0
+	}
+	widget_class "*XfdesktopIconView*" style "xfdesktop-icon-view"
+
+
+随着向GTK 3的转换，GTK所需的CSS语法略有改变。我发现在~/.config/GTK-3.0/gtk.css上放置以下行可以解决这个问题：
+
+	* {
+	    -XfdesktopIconView-ellipsize-icon-labels: 0;
+	}
+
+
+
+
+### .desktop 文件
+
+
+
+自定义图标
+terminal=true 以窗口打开
+
+
+
+
+
+
+## 双系统引导
+
+
+
+
+### 让 Linux 的引导加载器（如 GRUB）引导 Windows
+
+你想让 Linux 的引导加载器（如 GRUB）引导 Windows，这是很常见的 双系统设置需求。下面是完整的操作步骤，假设你已经安装了 Windows 和 Linux 双系统：
+
+✅ 一、确认 GRUB 是否已经安装
+如果你是先装的 Windows 后装的 Linux，一般 Linux 会自动安装 GRUB 并接管引导。
+✅ 二、更新 GRUB 配置，添加 Windows 引导项
+在 Linux 系统下执行：
+sudo update-grub
+这条命令会自动扫描所有已安装的系统（包括 Windows），并在 GRUB 菜单中添加它。
+输出中你应该看到类似：
+Found Windows Boot Manager on /dev/sda1
+如果找到了，它就会被添加进 /boot/grub/grub.cfg 中，下次重启就可以看到 Windows 启动项了。
+✅ 三、重启测试
+重启电脑时，你应该看到 GRUB 的启动菜单中有一项是：
+Windows Boot Manager (on /dev/sdX)
+选择这项即可启动 Windows。
+
+
+
+## 亮度调节
+
+
+### xrandr
+使用 xrandr | grep -v disconnected | grep connected命令查看连接的显示设备
+调节亮度xrandr --output *** --brightness 0.5
+
+
+
+
+### ddcutil（部分linux自带）
+
+```
+探测支持控制的显示器
+ddcutil detect
+
+设置屏幕亮度:
+ddcutil setvcp 10 50
+10 表示 设置亮度代码(code)， 50 表示需要调节的亮度(0-100)。
+
+查看当前显示器亮度:
+ddcutil getvcp 10
+
+还支持设置一些其它参数， 具体支持的code可以用如下命令查看:
+ddcutil vcpinfo
+```
+
+
+### 未查找到显示器
+连接显示器后用 ddcutil detect 命令没有查找的显示器，可能是应为显示器的i2c驱动没有自动加载，可以用如下方式手动加载驱动:
+
+      sudo modprobe i2c-dev
+
+
+
+## 视频硬件加速
+
+为 chrome 添加启动参数
+
+VaAPI on Linux with Vulkan
+
+	google-chrome-stable --use-gl=angle --use-angle=vulkan --enable-features=AcceleratedVideoEncoder,VaapiOnNvidiaGPUs,VaapiIgnoreDriverChecks,Vulkan,DefaultANGLEVulkan,VulkanFromANGLE --ignore-gpu-blocklist --disable-gpu-driver-bug-workaround
+
+
+
+
+
+
+## 安全的卸载硬盘
+
+      sudo fdisk -l
+      gio mount -t /dev/sda
+
+
+
+
+### udisksctl
+
+      使用该命令需要先卸载挂载点，然后停止设备。使用 unmount 子命令卸载挂载点，使用 power-off 子命令可以设备：
+
+      udisksctl unmount -b /dev/sdb1
+      udisksctl unmount -b /dev/sdb2
+      udisksctl unmount -b /dev/sdb3
+      udisksctl power-off -b /dev/sdb
 
 
 
@@ -186,6 +377,14 @@ and then add the following lines.
 	sudo dpkg-reconfigure locales
 	第一步，第二步都选择中文即可
 		如果第一步选过，只是选择第二步就可以
+
+
+### 暂时切换语言
+
+加参数
+
+      export LANG=zh_CN.UTF-8
+      export LANG=en_US.utf8
 
 
 ## 窗口栏 同种类型但是会聚合显示
@@ -502,6 +701,132 @@ resize2fs /dev/sdb1
 	
 
 
+## 电源选项
+
+
+
+
+
+### tlp
+
+    sudo apt install tlp tlp-rdw
+    
+    systemctl status tlp
+    tlp-stat -s  # 查看当前电源模式和配置状态
+    tlp-stat -p  # 查看 CPU 相关配置
+
+    vim /etc/tlp.conf
+
+
+```
+一、启用 TLP
+默认已启用，无需修改：
+ini
+TLP_ENABLE=1  # 1=启用，0=禁用
+
+电源模式切换
+无需手动干预，TLP 会自动根据「插电 / 电池」切换模式：
+ini
+# TLP_DEFAULT_MODE=AC  # 仅用于无法检测电源的设备
+# TLP_PERSISTENT_DEFAULT=0  # 0=自动切换，1=强制使用默认模式
+
+二、CPU 能效优化（核心配置）
+1. 频率调节策略
+推荐保持默认（自动适配硬件），如需手动调整：
+
+ini
+# Intel 处理器（intel_pstate 驱动）推荐：
+CPU_SCALING_GOVERNOR_ON_AC=performance    # 插电时高性能
+CPU_SCALING_GOVERNOR_ON_BAT=powersave     # 电池时节能
+
+# AMD 或旧 Intel 处理器（acpi-cpufreq 驱动）推荐：
+# CPU_SCALING_GOVERNOR_ON_AC=schedutil
+# CPU_SCALING_GOVERNOR_ON_BAT=schedutil
+
+2. 性能限制（延长续航）
+ini
+# 电池模式下限制 CPU 最大性能（0-100%）
+CPU_MAX_PERF_ON_BAT=70  # 例如限制到 70% 性能
+
+# 禁用电池模式下的 Turbo Boost（超频）
+CPU_BOOST_ON_BAT=0
+3. 核心休眠（轻负载节能）
+ini
+SCHED_POWERSAVE_ON_BAT=1  # 1=轻负载时关闭部分核心
+
+三、电池保护（延长电池寿命）
+1. 充电阈值（仅限支持的设备，如联想 ThinkPad）
+ini
+# 充电到 80% 停止，低于 75% 开始充电（减少满电损耗）
+START_CHARGE_THRESH_BAT0=75
+STOP_CHARGE_THRESH_BAT0=80
+2. 其他设备通用建议
+ini
+RESTORE_THRESHOLDS_ON_BAT=1  # 拔电时恢复默认充电阈值
+
+四、硬盘与存储设备节能
+硬盘休眠与功耗
+ini
+# 机械硬盘高级电源管理（128=中等节能，254=最大节能）
+DISK_APM_LEVEL_ON_BAT="128"
+
+# 固态/机械硬盘自动休眠超时（单位：秒）
+AHCI_RUNTIME_PM_TIMEOUT=30  # 30秒无操作后休眠
+```
+
+
+
+
+###  cpufreq
+
+      勿使用，使用下方 cpupower
+
+      sudo cpufreq-set -g performance
+      sudo cpufreq-set -g powersave
+
+      效果不明显
+
+
+### cpupower
+
+简介：Linux 内核自带的 CPU 频率调节工具，可设置 CPU 性能模式（如节能、平衡、高性能）。
+
+
+  cpupower frequency-info
+
+  sudo cpupower frequency-set -g powersave
+  sudo cpupower frequency-set -g performance
+  sudo cpupower frequency-set -g ondemand
+
+
+
+
+
+
+#### cpupower 限制 cpu 频率
+
+
+      封装了cpureq
+      效果明显
+
+
+
+      限制 cpu 频率会导致 cpu 占用过高，进一步卡顿和升温
+      合理的范围是必要的
+
+      cpupower -c all frequency-set -f 2.4GHz
+      设置CPU最小频率
+
+      sudo  cpupower -c all frequency-set -d 1.4GHz
+      设置CPU最大频率
+
+      sudo  cpupower -c all frequency-set -u 1.6GHz
+
+
+
+
+
+
 # 错误修复
 
 
@@ -574,6 +899,53 @@ The solution is to turn off the startup of clipboard in setting ->session and st
 
 
 # 美化
+
+
+
+
+
+## 登录界面的主题
+
+是由root控制的
+
+      sudo apt install materia-gtk-theme murrine-themes 
+
+
+
+
+## 字体
+
+
+
+### 默认的 
+Monospace Font
+Monospace Bold
+10
+
+注意，Monospace字体和Default字体可以不同，终端中要设置和系统字体相同
+Monospace Bold
+
+
+### 好看的
+
+Andale Mono Bold
+Default Font
+Nimbus Sans Bold
+10
+
+
+Default Font
+Sans Regular 10
+Default Monospace Font
+Monospace Regular 10
+
+
+
+## 主题
+
+      sudo apt install materia-gtk-theme papirus-icon-theme
+
+
 
 
 ### xfce 更换主题
@@ -676,7 +1048,84 @@ debian 安装 plymouth 美化开机动画
 
 
 
-### wine
+
+
+
+
+
+## zsh
+
+1. 安装
+安装 zsh
+
+2. 切换
+chsh -s $(which zsh)
+chsh -s /bin/bash
+chsh -s /usr/bin/zsh
+
+快捷键
+
+1. 默认快捷键
+→ (右方向键): 接受整个建议
+Ctrl+F: 接受整个建议
+
+2. 自定义快捷键
+在 ~/.zshrc 文件中添加以下配置：
+
+双击 Tab 接受建议
+
+	bindkey '\t\t' autosuggest-accept
+
+单击 Tab 逐词接受建议
+
+	bindkey '^I' forward-word
+
+
+
+
+
+## 堆叠式窗口管理器
+
+      openbox
+      .xsession
+
+      exec openbox-session
+
+
+
+
+
+## 支持 手动布局的资源管理器
+
+nemo 用户可在图标视图下，通过菜单栏选择 “查看”>“排列项”>“手动”，或者右键单击空白处选择 “排列项”>“手动” 来实现。
+
+
+
+
+
+
+
+## 计算器
+
+      sudo apt install kalgebra
+
+
+
+
+## 远程桌面
+
+
+### 被控
+
+      apt install xrdp
+
+
+### rdp
+
+xfreerdp3 /u:"username" /p:"password" /v:127.0.0.1 /cert:tofu /w:1920 /h:1025 /sound  
+
+
+## wine
 
 安装 wine 10.x
 
@@ -736,9 +1185,11 @@ budtmo/docker-android:emulator_11.0
 ```
 
 
-## 文本识别工具 
+## 文本识别工具
 
-UmiOcr 
+UmiOcr
+
+https://github.com/pot-app/pot-desktop
 
 
 ## 谷歌浏览器中文
@@ -754,8 +1205,8 @@ UmiOcr
 或者 将系统语言设置为中文，浏览器界面也会变成中文
 
 
-
-## 虚拟机 vitrual box
+## 虚拟机
+### vitrual box
 
 	dpkg -i 安装
 	出现故障 需要删掉软盘， 之后正常
@@ -773,6 +1224,65 @@ UmiOcr
 	2. 要在 VirtualBox 中使用 USB 驱动器，你的当前用户需要位于 vboxusers 组中
 	`sudo usermod -aG vboxusers $USER`
 	3. 关机之后设备usb设备中添加设备
+
+
+### kvm
+
+
+一、检查虚拟化支持：lscpu | grep Virtualization
+
+二、安装必要组件：
+
+      sudo apt install virt-manager qemu-system qemu-utils libvirt-daemon-system
+
+1. virt-manager： 图形界面
+2. qemu-system：虚拟器，配合kvm，完成虚拟器功能
+3. qemu-utils：处理器仿真器，比如模拟arm处理器
+4. libvirt-daemon-system：提供API，使GUI能够和各类进程、服务通信
+
+三、检查KVM：lsmod | grep -i kvm，也就是成功安装没有
+
+四、启动：
+virt-manager
+应用图标启动
+
+      qemu-kvm – 一个提供硬件仿真的开源仿真器和虚拟化包
+      virt-manager – 一款通过 libvirt 守护进程，基于 QT 的图形界面的虚拟机管理工具
+      libvirt-daemon-system – 为运行 libvirt 进程提供必要配置文件的工具
+      virtinst – 一套为置备和修改虚拟机提供的命令行工具
+      libvirt-clients – 一组客户端的库和API，用于从命令行管理和控制虚拟机和管理程序
+      bridge-utils – 一套用于创建和管理桥接设备的工具
+
+
+出中看到的，libvirt的默认网络处于非活动状态，因此通过运行以下命令使其处于活动状态，并在系统重新启动时自动重新启动：
+
+      sudo virsh net-start default
+      sudo virsh net-autostart default
+
+启用虚拟化守护进程（libvirtd）：
+
+      sudo systemctl status libvirtd
+      sudo systemctl enable --now libvirtd
+      sudo systemctl start libvirtd 
+
+
+
+如果是在普通用户下操作的，将当前登录用户加入 kvm 和 libvirt 用户组，以便能够创建和管理虚拟机。
+
+      sudo usermod -aG kvm $USER
+      sudo usermod -aG libvirt $USER
+
+
+
+sudo apt install qemu-kvm libvirt-clients libvirt-daemon-system bridge-utils virtinst libvirt-daemon
+
+
+
+#### KVM启动虚拟机时报错Requested operation is not valid: network ‘default‘ is not active
+
+      sudo virsh net-start default
+      sudo virsh net-autostart default
+
 
 
 
@@ -835,22 +1345,27 @@ UmiOcr
 
 位置
 
-	/usr/share/applications/
- 
-
-
-
-## 调节cpu能耗 cpufreq
-
-	sudo cpufreq-set -g performance
-	sudo cpufreq-set -g powersave
-
+      home/XXXXX/.local/share/applications/ 
 
 
 
 ## xfce自带的webdav
 
 	dav://user@106.12.111.6:5244/dav/
+
+
+如果卡死
+
+      重启 thuanr
+      kill -HUP $(pgrep -i thunar)
+      thunar --daemon &
+
+
+      重启 thunar 的挂载模块
+      systemctl --user restart gvfs-daemon.service
+
+
+
 
 
 
@@ -900,6 +1415,19 @@ UmiOcr
 	以上是在Linux中解压.zip文件部分文件的命令示例。根据实际情况选择合适的命令来满足你的需求。
 
 
+## winapps： 将 windows 虚拟机软件和 linux 融合
+
+
+
+启动某个软件：
+
+      /home/firgk/.local/bin/winapps manual C:\Windows\system32\cmd.exe
+      /home/firgk/.local/bin/winapps manual C:\Program Files (x86)\Tencent\QQMusic\QQMusic.exe
+      
+
+一些个性化配置
+
+      .local/bin/winapp
 
 
 
@@ -988,6 +1516,8 @@ vi .bashrc
 
 配置加速
 
+方式1：
+
 	sudo mkdir -p /etc/docker
 	sudo vim /etc/docker/daemon.json
 
@@ -1003,6 +1533,53 @@ vi .bashrc
 	sudo systemctl restart docker
 
 
+方式2：
+
+      sudo mkdir -p /etc/systemd/system/docker.service.d
+      sudo touch /etc/systemd/system/docker.service.d/proxy.conf
+
+
+      [Service]
+      Environment="HTTP_PROXY=http://proxy.example.com:8080/"
+      Environment="HTTPS_PROXY=http://proxy.example.com:8080/"
+      Environment="NO_PROXY=localhost,127.0.0.1,.example.com"
+
+      我的
+      [Service]
+      Environment="HTTP_PROXY=http://127.0.0.1:7897/"
+      Environment="HTTPS_PROXY=http://127.0.0.1:7897/"
+
+
+
+
+
+### docker 需要root
+
+✅ 解决方案（无需重启）
+1️⃣ 确保当前用户属于 docker 组
+运行以下命令，检查用户是否属于 docker 组：
+
+groups
+如果 docker 不在输出中，手动添加当前用户到 docker 组：
+
+sudo usermod -aG docker $USER
+然后，手动刷新用户组（避免重新登录）：
+
+newgrp docker
+再次运行：
+
+groups
+如果 docker 现在出现在列表中，尝试：
+
+docker ps
+
+
+
+### 指定配置文件启动 docker
+
+docker compose --file ~/.config/winapps/compose.yaml start
+docker compose --file ~/.config/winapps/compose.yaml kill
+
 
 
 
@@ -1017,6 +1594,38 @@ vi .bashrc
          -e TZ=Asia/Shanghai \
          -e MYSQL_ROOT_PASSWORD=123456 \
          mysql:5.7
+
+
+
+### Docker Compose 更新容器的几种方法
+
+
+1. 方法一：使用`docker-compose up -d`命令更新容器
+对于一个已经在运行的Docker Compose应用程序，如果需要更新其中的某个容器，有以下几种方法：
+
+方法一：使用docker-compose up -d命令更新容器
+如果已经修改了docker-compose.yml文件，并且希望更新其中的某个容器，可以直接使用docker-compose up -d命令。
+该命令会更新docker-compose.yml中修改过的服务，并根据修改的设置进行重新配置。例如：
+
+	docker-compose up -d service-name
+
+其中 service-name是需要更新的服务名
+
+
+	docker compose --file ~/.config/winapps/compose.yaml  up -d
+
+
+2. 方法二：使用docker-compose stop和docker-compose rm命令重新启动容器
+如果需要完全重启一个容器，并清除其中的所有数据，可以使用以下两个命令：
+
+docker-compose stop service-name
+docker-compose rm -f service-name
+docker-compose up -d service-name
+
+这会停止并删除名为 service-name 的容器，并根据docker-compose.yml重新启动它。这种方法比较适用于需要对容器进行某些比较复杂的更改，或者在更新过程中出现了一些问题。
+
+
+
 
 
 
@@ -1084,3 +1693,14 @@ vi .bashrc
 
 
 # 其他
+
+
+
+
+# 一些测试和实验
+
+虚拟机下 单核较卡顿
+双核流畅 win10
+
+
+

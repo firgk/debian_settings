@@ -56,7 +56,10 @@ cmd /k "code C:\Users\lgh\Desktop\thymefy.md"
 
 
 
+## windows to go
+Rufus
 
+  Rufus 外置硬盘 windows to go
 
 
 
