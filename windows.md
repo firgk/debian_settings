@@ -1,4 +1,9 @@
+## install
 
+安装
+家庭版 或者 专业版 
+office 也是这两个版本
+使用 https://github.com/massgravel/Microsoft-Activation-Scripts 激活
 
 
 
